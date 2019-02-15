@@ -1,12 +1,12 @@
-EXECS=simulated_annealing
+EXECS=tabu_search
 CPP=g++
 VERSION=c++11
 
 all: ${EXECS}.o
-	#${CPP} -std=${VERSION} simulated_annealing.o knn.o -o simulated_annealing
+	#${CPP} -std=${VERSION} tabu_search.o knn.o -o tabu_search
 
-simulated_annealing.o: simulated_annealing.cpp knn.hpp
-	${CPP}  -std=${VERSION} simulated_annealing.cpp -O3
+tabu_search.o: tabu_search.cpp knn.hpp
+	${CPP}  -std=${VERSION} tabu_search.cpp -O3
 
 #knn.o: knn.cpp t_data.hpp knn.hpp
 #	${CPP} -o knn.o -std=${VERSION} -c knn.cpp -O3 -lm

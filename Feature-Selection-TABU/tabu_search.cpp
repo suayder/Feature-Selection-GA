@@ -31,9 +31,24 @@ auto count_bits = [](vector<bool>& v){
         return cont;
     };
 
+void print_solution(_solution solu){
+
+    cout<< "Selected features: ";
+    for (auto i:solu.attributes)
+        cout<< i;
+    cout<<" Fitness: "<<solu.fitness<<endl;
+}
+
 _solution generate_new(unsigned int , Knn<>&);
 vector<_solution> getNeighbors(int n_attribute, vector<bool>& features, Knn<>& knn_classifier);
 
+bool searchSolution(deque<_solution>& array, _solution* target){
+    for (deque<_solution>::iterator it = array.begin(); it!=array.end(); ++it){
+        if(it->fitness == target->fitness && it->attributes == target->attributes)
+            return false;
+    }
+    return true;
+}
 int main(int argc, char const *argv[])
 {
     srand(time(NULL));
@@ -47,19 +62,34 @@ int main(int argc, char const *argv[])
     Knn<> knn_classifier(&data);
 
     _solution currentSolution = generate_new(data.n_attribute,knn_classifier);
+    _solution newBestSolution = currentSolution;
     vector <_solution> neighbors;
 
     deque<_solution> tabuList;
+    cout<<"Started: ";
+    print_solution(currentSolution);
+    cout<<"\noptimized: ";
 
     int iter = 0;
     while(500>iter++){
 
         neighbors = getNeighbors(data.n_attribute, currentSolution.attributes, knn_classifier);
-        currentSolution = neighbors.at(0);
-        for(){
-            currentSolution = neighbors.at(0);
+        if(currentSolution.fitness < neighbors.at(0).fitness)
+            newBestSolution = neighbors.at(0);
+
+        for(auto i: neighbors){
+            if(searchSolution(tabuList,&i)){
+                newBestSolution = i;
+            }
         }
+        if(tabuList.size()!=0){
+            tabuList.pop_back();
+            tabuList.push_front(currentSolution);
+        }
+        currentSolution = newBestSolution;
     }
+
+    print_solution(currentSolution);
 
     return 0;
 }
