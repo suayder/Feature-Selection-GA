@@ -1,7 +1,11 @@
 #include <time.h>
-#include<iostream>
+#include <iostream>
 #include "knn.hpp"
+#include <deque>
+#include <algorithm>
+
 #define ALPHA 0.93
+#define NEIGHBORS 4
 using namespace std;
 
 typedef struct sol{
@@ -28,7 +32,7 @@ auto count_bits = [](vector<bool>& v){
     };
 
 _solution generate_new(unsigned int , Knn<>&);
-_solution generate_near(int , vector<bool>&, Knn<>&);
+vector<_solution> getNeighbors(int n_attribute, vector<bool>& features, Knn<>& knn_classifier);
 
 int main(int argc, char const *argv[])
 {
@@ -42,6 +46,21 @@ int main(int argc, char const *argv[])
 
     Knn<> knn_classifier(&data);
 
+    _solution currentSolution = generate_new(data.n_attribute,knn_classifier);
+    vector <_solution> neighbors;
+
+    deque<_solution> tabuList;
+
+    int iter = 0;
+    while(500>iter++){
+
+        neighbors = getNeighbors(data.n_attribute, currentSolution.attributes, knn_classifier);
+        currentSolution = neighbors.at(0);
+        for(){
+            currentSolution = neighbors.at(0);
+        }
+    }
+
     return 0;
 }
 
@@ -51,27 +70,30 @@ _solution generate_new(unsigned int n_attribute, Knn<>& knn_classifier){
     do{ //ensure that vector generated will not have all values less then two
         for(unsigned int i =0; i<n_attribute; i++) //Initialize a random features selected
             selected_features.at(i) = (rand()%10<5)?0:1;
-    }while(count_bits(selected_features)==0);
+    }while(count_bits(selected_features)<=2);
     
     return _solution(fitness(knn_classifier.evaluate(selected_features), count_bits(selected_features), n_attribute, ALPHA),selected_features);
 
 }
 
-_solution generate_near(int n_attribute, vector<bool>& features, Knn<>& knn_classifier){
-    
-    int q = rand()%(n_attribute);
+bool compare(_solution a, _solution b){
+    return (a.fitness >b.fitness);
+}
+
+vector<_solution> getNeighbors(int n_attribute, vector<bool>& features, Knn<>& knn_classifier){
 
     auto flip = [&features](int id){
-        features[id] = (features[id]==0)?features[id]=1:features[id]=0;
+        features[id] = (features[id]==0)?1:0;
     };
+    vector<_solution> neighbors;
 
-    do{
-        for(int i =0; i<q; i++){ //Initialize a random features selected
-            srand(clock());
+    for(int i =0; i<NEIGHBORS; i++){ //Initialize a random features selected
+        do{
             int index = rand()%(n_attribute);
             flip(index);
-        }
-    }while(count_bits(features)<features.size()*0.2);
-
-    return _solution (fitness(knn_classifier.evaluate(features), count_bits(features), n_attribute, ALPHA),features);
+        }while(count_bits(features)<=2);
+        neighbors.push_back(_solution (fitness(knn_classifier.evaluate(features), count_bits(features), n_attribute, ALPHA),features));
+    }
+    sort(neighbors.begin(), neighbors.end(), compare);
+    return neighbors;
 }
