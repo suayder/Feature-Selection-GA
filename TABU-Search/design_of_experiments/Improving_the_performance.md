@@ -2,15 +2,16 @@
 
 ### First step: Select parametters for fine-tuning 
 
-- Temperature (temp)
-- Decrease in temperature (sTem)
+- Number of iterations (Ni)
+- Neighbors range size (Nb)
 - parameter for fitness function (alpha)
+- Tabu list size (Tbz)
 
 ### Second step: Define a range of values for parameters
 
-|       |fTemp|sTem|alpha|
-|-------|-----|----|-----|
-|Low    |1000 |0.80|0.70 |
-|High   |4000 |0.99|0.99 |
+|       |  Ni | Nb | Tbz | alpha |
+|-------|-----|----|-----|-------|
+|Low    | 200 | 2  |  2  | 0.60  |
+|High   | 800 | 8  | 30  | 0.99  |
 
 All parameters are relevantas for the final results

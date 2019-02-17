@@ -92,7 +92,7 @@ template<int K>
 double Knn<K>::euclideanDistance(int* v1, int* v2, vector<bool>& selected_features){
     //int sfetures_size = selected_features.size();
     double sum = 0.0;
-    for (int i =0;i<this->data->n_attribute;i++){
+    for (int i =0;i<this->data->n_attribute-1;i++){
         if(selected_features[i] == 1){
             sum +=(double)pow((v2[i]-v1[i]),2);
         }

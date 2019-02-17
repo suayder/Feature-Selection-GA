@@ -4,8 +4,9 @@
 #include <deque>
 #include <algorithm>
 
-#define ALPHA 0.93
-#define NEIGHBORS 4
+#define ALPHA 0.79
+#define NEIGHBORS 2
+#define TB_LIST 2
 using namespace std;
 
 typedef struct sol{
@@ -27,7 +28,6 @@ auto count_bits = [](vector<bool>& v){
         for(auto it:v)
             if(it==true)
                 cont++;
-
         return cont;
     };
 
@@ -45,12 +45,12 @@ vector<_solution> getNeighbors(int n_attribute, vector<bool>& features, Knn<>& k
 bool searchSolution(deque<_solution>& array, _solution* target){
     for (deque<_solution>::iterator it = array.begin(); it!=array.end(); ++it){
         if(it->fitness == target->fitness && it->attributes == target->attributes)
-            return false;
+            return true;
     }
-    return true;
+    return false;
 }
-int main(int argc, char const *argv[])
-{
+int main(int argc, char const *argv[]){
+
     srand(time(NULL));
 
     if(argc!=2){
@@ -71,21 +71,28 @@ int main(int argc, char const *argv[])
     cout<<"\noptimized: ";
 
     int iter = 0;
-    while(500>iter++){
+    while(200>iter++){
 
         neighbors = getNeighbors(data.n_attribute, currentSolution.attributes, knn_classifier);
         if(currentSolution.fitness < neighbors.at(0).fitness)
             newBestSolution = neighbors.at(0);
 
         for(auto i: neighbors){
-            if(searchSolution(tabuList,&i)){
+            if(!searchSolution(tabuList,&i)){
                 newBestSolution = i;
+                break;
             }
         }
-        if(tabuList.size()!=0){
-            tabuList.pop_back();
+        if(tabuList.size()==TB_LIST){
+            if(currentSolution.attributes != tabuList.back().attributes){
+                tabuList.pop_back();
+                tabuList.push_front(currentSolution);
+            }
+        }
+        else{
             tabuList.push_front(currentSolution);
         }
+
         currentSolution = newBestSolution;
     }
 
@@ -107,7 +114,7 @@ _solution generate_new(unsigned int n_attribute, Knn<>& knn_classifier){
 }
 
 bool compare(_solution a, _solution b){
-    return (a.fitness >b.fitness);
+    return (a.fitness < b.fitness);
 }
 
 vector<_solution> getNeighbors(int n_attribute, vector<bool>& features, Knn<>& knn_classifier){
@@ -125,5 +132,6 @@ vector<_solution> getNeighbors(int n_attribute, vector<bool>& features, Knn<>& k
         neighbors.push_back(_solution (fitness(knn_classifier.evaluate(features), count_bits(features), n_attribute, ALPHA),features));
     }
     sort(neighbors.begin(), neighbors.end(), compare);
+    //cout<< neighbors.at(0).fitness <<" - "<< neighbors.at(1).fitness<<endl;
     return neighbors;
 }
