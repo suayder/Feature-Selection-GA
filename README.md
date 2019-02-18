@@ -5,7 +5,7 @@ This repo conteins some metaheuristics implementation for feature selection prob
 More precisally three algoriths:
 
 - Simmulated Annealing
-- Genetical Algorithm
+- Genetical Algorithm (not commited yet)
 - Tabu Search
 
 Each of then for parameters use DOE (Design of Experiments) for parameters selection, and the read data file code is implemented for read  Brast Cancer Data from Machine learning UI.
